@@ -9,6 +9,7 @@ import 'package:flixr/network/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Color bgContrast = const Color(0xFFF0F0F0);
 Color bg = const Color(0xFFFFFFFF);
@@ -60,6 +61,9 @@ class _HomeState extends State<Home> {
               _futureBar(context)
             ] : [
               _searchBar("Enter movie title", context),
+              SizedBox(height: 15,),
+              Text("Now Playing", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: -1)),
+              _homeContent(context)
             ],
           ),
         ),
@@ -152,7 +156,7 @@ class _HomeState extends State<Home> {
     List<String> assetLoader = ["green", "red", "yellow"];
     return Container(
       clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: const EdgeInsets.only(bottom: 20),
       width: double.infinity,
       // height: 410,
       decoration: ShapeDecoration(
@@ -261,6 +265,32 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+  _homeContent(BuildContext context) {
+    return Container(
+      height: 800,
+      padding: EdgeInsets.only(bottom: 40, top: 10),
+      child: FutureBuilder(
+        future: _getNowPlaying(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            // print(snapshot.data)
+            return _nowPlayingList(snapshot.data);
+          }
+          return const Center(child: CupertinoActivityIndicator());
+        },
+      ),
+    );
+  }
+
+  Widget _nowPlayingList(data) {
+    return ListView.builder(
+      itemCount: 10,
+      itemBuilder: (context, int index) {
+        return movieCard(data[index]);
+      },
+    );
+  }
 }
 
 void _getGlobalResults(String value) {
@@ -284,6 +314,12 @@ dynamic _getMovie(int mid) {
 
 dynamic _getCast(int movieId) {
   Future response = Network().getCast(movieId);
+
+  return response;
+}
+
+dynamic _getNowPlaying() {
+  Future response = Network().getNowPlaying();
 
   return response;
 }

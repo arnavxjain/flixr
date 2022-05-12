@@ -86,4 +86,31 @@ class Network {
     return actors;
   }
 
+  Future<List<Movie>> getNowPlaying() async {
+    List<Movie> listOfResults = [];
+    Response response = await get(Uri.parse(Uri.encodeFull("http://api.themoviedb.org/3/movie/now_playing?api_key=$apiKey")));
+
+    if (response.statusCode == 200) {
+      final res = json.decode(response.body);
+
+      int lengthOfRes = res["results"].length;
+
+      for (int x = 0; x < lengthOfRes; x++) {
+        final dataindex = res["results"][x];
+        Movie newMovieX = Movie(
+            title: dataindex["title"],
+            adult: dataindex["adult"],
+            overview: dataindex["overview"],
+            release: dataindex["release_date"],
+            poster: dataindex["poster_path"],
+            movieId: dataindex["id"],
+            vote: dataindex["vote_average"]
+        );
+        listOfResults.add(newMovieX);
+      }
+    }
+
+    return listOfResults;
+  }
+
 }
