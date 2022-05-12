@@ -58,11 +58,48 @@ class _HomeState extends State<Home> {
           child: Column(
             children: contentOpacity == true ? [
               _searchBar("Enter movie title", context),
+              SizedBox(height: 20,),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        FaIcon(FontAwesomeIcons.list, size: 20,),
+                        SizedBox(width: 3,),
+                        Text(" Results", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, letterSpacing: -1)),
+                      ],
+                    ),
+                    GestureDetector(
+                      child: Icon(Icons.cancel_rounded, size: 23, color: Colors.grey.withOpacity(0.4),),
+                      onTap: () {
+                        // movieRes = Movie();
+                        streamController.add(0);
+                      },
+                    )
+                  ],
+                ),
+              ),
+              // SizedBox(height: 5,),
               _futureBar(context)
             ] : [
               _searchBar("Enter movie title", context),
               SizedBox(height: 15,),
-              Text("Now Playing", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: -1)),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FaIcon(FontAwesomeIcons.film, size: 20,),
+                    SizedBox(width: 3,),
+                    Text(" Now Playing", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, letterSpacing: -1)),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5,),
               _homeContent(context)
             ],
           ),
