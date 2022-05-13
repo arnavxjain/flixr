@@ -6,32 +6,55 @@ import 'package:http/http.dart';
 const apiKey = "a47fb0ba038702bdab7994999dce820b";
 
 class Network {
-  Future<List<Movie>> searchGlobal(String term) async {
-    Response response = await get(Uri.parse(Uri.encodeFull("http://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$term")));
+  Future<List> searchGlobal(String term) async {
+    List<Movie> listOfMovies = [];
+    List<Actor> listOfActors = [];
+    List<TVShow> listOfShows = [];
+    // Response response = await get(Uri.parse(Uri.encodeFull("http://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$term")));
+    Response response = await get(Uri.parse(Uri.encodeFull("http://api.themoviedb.org/3/search/multi?api_key=$apiKey&query=$term")));
 
     if (response.statusCode == 200) {
       final res = json.decode(response.body);
-      List<Movie> listOfResults = [];
+
       int lengthOfRes = res["results"].length;
 
       for (int x = 0; x < lengthOfRes; x++) {
         final dataindex = res["results"][x];
-        Movie newMovieX = Movie(
-          title: dataindex["title"],
-          adult: dataindex["adult"],
-          overview: dataindex["overview"],
-          release: dataindex["release_date"],
-          poster: dataindex["poster_path"],
-          movieId: dataindex["id"],
-          vote: dataindex["vote_average"]
-        );
-        listOfResults.add(newMovieX);
-      }
 
-      return listOfResults;
+        if (dataindex["media_type"] == "movie") {
+          Movie newMovieX = Movie(
+              title: dataindex["title"],
+              adult: dataindex["adult"],
+              overview: dataindex["overview"],
+              release: dataindex["release_date"],
+              poster: dataindex["poster_path"],
+              movieId: dataindex["id"],
+              vote: dataindex["vote_average"]
+          );
+          listOfMovies.add(newMovieX);
+        }
+        else if (dataindex["media_type"] == "tv") {
+          TVShow newShowX = TVShow(
+              title: dataindex["title"],
+              overview: dataindex["overview"],
+              firstAir: dataindex["release_date"],
+              poster: dataindex["poster_path"],
+              id: dataindex["id"],
+              vote: dataindex["vote_average"]
+          );
+          listOfShows.add(newShowX);
+        } else if (dataindex["media_type"] == "person") {
+          Actor newActorX = Actor(
+            name: dataindex["name"],
+            id: dataindex["id"],
+            pic: dataindex["profile_path"],
+          );
+          listOfActors.add(newActorX);
+        }
+      }
     }
 
-    return [Movie(movieId: 0)];
+    return [listOfMovies, listOfShows, listOfActors];
   }
 
   Future<Movie> indexMovie(int mid) async {
@@ -115,7 +138,7 @@ class Network {
 
   Future<Actor> getActorDetails(int? id) async {
     Actor detailedActor = Actor();
-    Response response = await get(Uri.parse(Uri.encodeFull("https://api.themoviedb.org/3/person/$id?api_key=$apiKey")));
+    Response response = await get(Uri.parse(Uri.encodeFull("http://api.themoviedb.org/3/person/$id?api_key=$apiKey")));
 
     if (response.statusCode == 200) {
       final res = json.decode(response.body);

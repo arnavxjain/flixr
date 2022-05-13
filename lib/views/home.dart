@@ -15,6 +15,9 @@ Color bg = const Color(0xFFFFFFFF);
 Color fg = const Color(0xFF232323);
 
 late List<Movie> movieRes;
+late List<Actor> actorsRes;
+late List<TVShow> showsRes;
+
 late Movie indexedMovie;
 
 class Home extends StatefulWidget {
@@ -53,10 +56,11 @@ class _HomeState extends State<Home> {
       backgroundColor: bg,
       body: SingleChildScrollView(
         child: Container(
+          // height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.only(top: 55, left: 20, right: 20),
           child: Column(
             children: contentOpacity == true ? [
-              _searchBar("Enter movie title", context),
+              _searchBar("Search for movies and actors", context),
               const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
@@ -81,9 +85,10 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
-              _futureBar(context)
+              _futureActorBar(context),
+              _futureMovieBar(context),
             ] : [
-              _searchBar("Enter movie title", context),
+              _searchBar("Search for movies and actors", context),
               const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
@@ -96,7 +101,7 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
-              const SizedBox(height: 10,),
+              const SizedBox(height: 6,),
               _homeContent(context)
             ],
           ),
@@ -144,6 +149,7 @@ class _HomeState extends State<Home> {
                 onSubmitted: (String value) {
                   if (value.isNotEmpty) {
                     _getGlobalResults(value);
+                    print(getMultiMovie(value));
                   }
                 },
                 style: const TextStyle(
@@ -166,7 +172,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _futureBar(context) {
+  Widget _futureMovieBar(context) {
     return Container(
       margin: const EdgeInsets.only(top: 20),
       height: MediaQuery.of(context).size.height,
@@ -175,6 +181,7 @@ class _HomeState extends State<Home> {
         removeTop: true,
         context: context,
         child: ListView.builder(
+          // physics: const NeverScrollableScrollPhysics(),
           itemCount: movieRes.length,
           itemBuilder: (context, int index) {
             return movieCard(movieRes[index]);
@@ -332,14 +339,122 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+  Widget _futureActorBar(BuildContext context) => actorsRes.length != 0 ? Container(
+      height: 315,
+      margin: const EdgeInsets.only(top: 14),
+      decoration: ShapeDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 20.5,
+              cornerSmoothing: 1,
+            ),
+          )),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(" Actors", style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, fontSize: 22),),
+          const SizedBox(height: 6,),
+          _createCastList(actorsRes, context),
+        ],
+      )
+    ) : const SizedBox.shrink();
+
+  Widget _createCastList(List<Actor> data, context) {
+    return Container(
+      height: 260,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: data.length,
+          itemBuilder: (context, int index) {
+            return _castCard(data[index]);
+          }
+      ),
+    );
+  }
+
+  Widget _castCard(Actor data) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(
+            builder: (context) => ActorsPage(actorId: data.id)
+        ));
+      },
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        // padding: EdgeInsets.all(10),
+        margin: const EdgeInsets.only(right: 15),
+        width: 200,
+        height: 280,
+        // alignment: Alignment.center,
+        decoration: ShapeDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 20.5,
+                cornerSmoothing: 1,
+              ),
+            ), image: DecorationImage(
+            fit: BoxFit.cover,
+            image: NetworkImage("https://image.tmdb.org/t/p/original${data.pic}")
+        )),
+        child: Column(
+          children: [
+            const SizedBox(height: 200),
+            SizedBox(
+              height: 60,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 200,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(width: 125, child: Text(data.name.toString(), style: const TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.7), overflow: TextOverflow.fade, maxLines: 1, softWrap: false)),
+                            Container(child: const FaIcon(FontAwesomeIcons.angleRight, color: Colors.blueAccent,), margin: const EdgeInsets.only(right: 6),)
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 void _getGlobalResults(String value) {
   Future response = Network().searchGlobal(value);
 
+  // print(response);
   response.then((res) {
-    movieRes = res;
+    movieRes = res[0];
+    showsRes = res[1];
+    actorsRes = res[2];
+
     streamController.add(1);
+  });
+}
+
+dynamic getMultiMovie(String value) {
+  Future response = Network().searchGlobal(value);
+
+  response.then((res) {
+    return res[2];
   });
 }
 
@@ -425,16 +540,20 @@ class _DetailsState extends State<Details> {
                     children: [
                       _backButton(),
                       const SizedBox(width: 4),
-                      Text(
-                        data!.title.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 22,
-                          letterSpacing: -1,
-                          // height: 0.45,
-                          overflow: TextOverflow.ellipsis
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: Text(
+                          data!.title.toString(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 22,
+                            letterSpacing: -1,
+                            // height: 0.45,
+                          ),
+                          overflow: TextOverflow.fade,
+                          softWrap: false,
+                          maxLines: 1,
                         ),
-                        maxLines: 1,
                       ),
                     ],
                   ),
