@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
-                        FaIcon(FontAwesomeIcons.list, size: 20,),
+                        FaIcon(FontAwesomeIcons.box, size: 20,),
                         SizedBox(width: 3,),
                         Text(" Results", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, letterSpacing: -1)),
                       ],
@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
               _futureBar(context)
             ] : [
               _searchBar("Enter movie title", context),
-              SizedBox(height: 15,),
+              SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
@@ -99,7 +99,7 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
-              SizedBox(height: 5,),
+              SizedBox(height: 10,),
               _homeContent(context)
             ],
           ),
@@ -174,11 +174,15 @@ class _HomeState extends State<Home> {
       margin: const EdgeInsets.only(top: 20),
       height: 800,
       width: double.infinity,
-      child: ListView.builder(
-        itemCount: movieRes.length,
-        itemBuilder: (context, int index) {
-          return movieCard(movieRes[index]);
-        }
+      child: MediaQuery.removePadding(
+        removeTop: true,
+        context: context,
+        child: ListView.builder(
+          itemCount: movieRes.length,
+          itemBuilder: (context, int index) {
+            return movieCard(movieRes[index]);
+          }
+        ),
       ),
     );
   }
@@ -321,11 +325,15 @@ class _HomeState extends State<Home> {
   }
 
   Widget _nowPlayingList(data) {
-    return ListView.builder(
-      itemCount: 10,
-      itemBuilder: (context, int index) {
-        return movieCard(data[index]);
-      },
+    return MediaQuery.removePadding(
+      removeTop: true,
+      context: context,
+      child: ListView.builder(
+        itemCount: 10,
+        itemBuilder: (context, int index) {
+          return movieCard(data[index]);
+        },
+      ),
     );
   }
 }
@@ -604,7 +612,7 @@ class _DetailsState extends State<Details> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(data.name.toString(), style: const TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white, fontWeight: FontWeight.w600, fontSize: 17), maxLines: 1,),
-                            Text(data.role.toString(), style: TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white.withOpacity(0.56)), maxLines: 1,)
+                            Text(data.role.toString(), style: TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white.withOpacity(0.8)), maxLines: 1,)
                           ],
                         ),
                       )
