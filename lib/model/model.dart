@@ -34,7 +34,10 @@ class Actor {
   final String? name;
   final String? pic;
   final int? id;
+  final String? about;
+  final String? birthday;
+  final String? birthplace;
 
-  Actor({this.role, this.name, this.pic, this.id});
+  Actor({this.role, this.name, this.pic, this.id, this.about, this.birthday, this.birthplace});
 
 }

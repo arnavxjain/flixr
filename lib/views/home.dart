@@ -9,7 +9,6 @@ import 'package:flixr/network/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 Color bgContrast = const Color(0xFFF0F0F0);
 Color bg = const Color(0xFFFFFFFF);
@@ -19,7 +18,7 @@ late List<Movie> movieRes;
 late Movie indexedMovie;
 
 class Home extends StatefulWidget {
-  Home(this.stream, {Key? key}) : super(key: key);
+  const Home(this.stream, {Key? key}) : super(key: key);
 
   final Stream<int> stream;
 
@@ -58,7 +57,7 @@ class _HomeState extends State<Home> {
           child: Column(
             children: contentOpacity == true ? [
               _searchBar("Enter movie title", context),
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
@@ -76,30 +75,28 @@ class _HomeState extends State<Home> {
                     GestureDetector(
                       child: Icon(Icons.cancel_rounded, size: 23, color: Colors.grey.withOpacity(0.4),),
                       onTap: () {
-                        // movieRes = Movie();
                         streamController.add(0);
                       },
                     )
                   ],
                 ),
               ),
-              // SizedBox(height: 5,),
               _futureBar(context)
             ] : [
               _searchBar("Enter movie title", context),
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
+                  children: const [
                     FaIcon(FontAwesomeIcons.film, size: 20,),
                     SizedBox(width: 3,),
                     Text(" Now Playing", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, letterSpacing: -1)),
                   ],
                 ),
               ),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               _homeContent(context)
             ],
           ),
@@ -172,7 +169,7 @@ class _HomeState extends State<Home> {
   Widget _futureBar(context) {
     return Container(
       margin: const EdgeInsets.only(top: 20),
-      height: 800,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: MediaQuery.removePadding(
         removeTop: true,
@@ -278,7 +275,6 @@ class _HomeState extends State<Home> {
                           margin: const EdgeInsets.only(right: 10, bottom: 10),
                           child: ElevatedButton(
                             onPressed: () {
-                              print("elevatedbutton: ${data.movieId}");
                               Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => Details(mid: data.movieId)
                               ));
@@ -309,8 +305,8 @@ class _HomeState extends State<Home> {
 
   _homeContent(BuildContext context) {
     return Container(
-      height: 800,
-      padding: EdgeInsets.only(bottom: 40, top: 10),
+      height: MediaQuery.of(context).size.height,
+      padding: const EdgeInsets.only(bottom: 40, top: 10),
       child: FutureBuilder(
         future: _getNowPlaying(),
         builder: (context, AsyncSnapshot snapshot) {
@@ -349,10 +345,6 @@ void _getGlobalResults(String value) {
 
 dynamic _getMovie(int mid) {
   Future response = Network().indexMovie(mid);
-
-  response.then((res) {
-    print(res);
-  });
 
   return response;
 }
@@ -399,28 +391,20 @@ class _DetailsState extends State<Details> {
   }
 
   Widget _backButton() {
-    return Container(
-      height: 50,
-      width: 50,
-      margin: const EdgeInsets.only(right: 10, bottom: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100),
-        color: Colors.grey.withOpacity(0.1)
-      ),
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: FaIcon(FontAwesomeIcons.angleLeft, color: Colors.black.withOpacity(0.4), size: 18,),
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(0.1)),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.0),
-                )
-            ),
-            elevation: MaterialStateProperty.all<double>(0)
-        ),
+    return CupertinoButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      padding: EdgeInsets.zero,
+      // onTap: () {
+      //   Navigator.pop(context);
+      // },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const FaIcon(FontAwesomeIcons.angleLeft, color: Colors.blueAccent,),
+          Container(child: const FaIcon(FontAwesomeIcons.box, size: 19, color: Colors.blueAccent,), margin: const EdgeInsets.only(bottom: 1, left: 2),)
+        ],
       ),
     );
   }
@@ -432,6 +416,7 @@ class _DetailsState extends State<Details> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 2,),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -446,7 +431,7 @@ class _DetailsState extends State<Details> {
                           fontWeight: FontWeight.w700,
                           fontSize: 22,
                           letterSpacing: -1,
-                          height: 0.45,
+                          // height: 0.45,
                           overflow: TextOverflow.ellipsis
                         ),
                         maxLines: 1,
@@ -455,6 +440,7 @@ class _DetailsState extends State<Details> {
                   ),
                 ],
               ),
+              const SizedBox(height: 7,),
               Stack(
                 children: [
                   Container(
@@ -541,7 +527,7 @@ class _DetailsState extends State<Details> {
   }
 
   Widget _cast(int mid, context) {
-    return Container(
+    return SizedBox(
       height: 260,
       child: FutureBuilder(
         future: _getCast(mid),
@@ -570,7 +556,9 @@ class _DetailsState extends State<Details> {
   Widget _castCard(Actor data) {
     return GestureDetector(
       onTap: () {
-        print(data.id);
+        Navigator.push(context, MaterialPageRoute(
+            builder: (context) => ActorsPage(actorId: data.id)
+        ));
       },
       child: Container(
         clipBehavior: Clip.hardEdge,
@@ -593,7 +581,7 @@ class _DetailsState extends State<Details> {
         child: Column(
           children: [
             const SizedBox(height: 200),
-            Container(
+            SizedBox(
               height: 60,
               child: ClipRRect(
                 child: BackdropFilter(
@@ -628,8 +616,14 @@ class _DetailsState extends State<Details> {
   }
 }
 
+dynamic _getActorDetails(int? id) {
+  Future response = Network().getActorDetails(id);
+
+  return response;
+}
+
 class ActorsPage extends StatefulWidget {
-  final int actorId;
+  final int? actorId;
   const ActorsPage({Key? key, required this.actorId}) : super(key: key);
 
   @override
@@ -639,6 +633,104 @@ class ActorsPage extends StatefulWidget {
 class _ActorsPageState extends State<ActorsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.only(top: 55, left: 20, right: 20, bottom: 40),
+          child: FutureBuilder(
+            future: _getActorDetails(widget.actorId),
+            builder: (context, AsyncSnapshot<Actor> snapshot) {
+              if (snapshot.hasData) {
+                return actorExtra(snapshot.data);
+              }
+              return const Center(child: CupertinoActivityIndicator());
+            }),
+          ),
+      )
+      );
+  }
+
+  Widget _backButton() {
+    return CupertinoButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      padding: EdgeInsets.zero,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const FaIcon(FontAwesomeIcons.angleLeft, color: Colors.blueAccent,),
+          const SizedBox(width: 2,),
+          Container(child: const FaIcon(FontAwesomeIcons.solidCircleUser, size: 19, color: Colors.blueAccent,), margin: const EdgeInsets.only(bottom: 1),)
+        ],
+      ),
+    );
+  }
+
+  Widget actorExtra(Actor? data) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 4, top: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  _backButton(),
+                  const SizedBox(width: 4),
+                  Text(
+                    data!.name.toString(),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                        letterSpacing: -1,
+                        height: 1,
+                        overflow: TextOverflow.ellipsis
+                    ),
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+              // Container(padding: EdgeInsets.only(right: 10), margin: EdgeInsets.only(bottom: 6)),
+            ],
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 10, bottom: 20),
+          height: 520,
+          decoration: ShapeDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: data.pic != null ? NetworkImage("https://image.tmdb.org/t/p/original${data.pic}") : const AssetImage('lib/assets/green.png') as ImageProvider,
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.05),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3), // changes position of shadow
+                ),
+              ],
+              color: bgContrast,
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 30,
+                  cornerSmoothing: 0.9,
+                ),
+              )),
+        ),
+        Text(
+          data.about.toString(),
+          style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 17,
+              letterSpacing: -0.7,
+              color: Colors.black.withOpacity(0.6)
+          ),
+        ),
+      ],
+    );
   }
 }

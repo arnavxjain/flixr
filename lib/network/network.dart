@@ -113,4 +113,23 @@ class Network {
     return listOfResults;
   }
 
-}
+  Future<Actor> getActorDetails(int? id) async {
+    Actor detailedActor = Actor();
+    Response response = await get(Uri.parse(Uri.encodeFull("https://api.themoviedb.org/3/person/$id?api_key=$apiKey")));
+
+    if (response.statusCode == 200) {
+      final res = json.decode(response.body);
+
+      detailedActor = Actor(
+        name: res["name"],
+        about: res["biography"],
+        birthday: res["birthday"],
+        birthplace: res["place_of_birth"],
+        pic: res["profile_path"]
+      );
+    }
+
+    return detailedActor;
+  }
+
+  }
