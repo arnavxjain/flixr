@@ -434,7 +434,7 @@ class _HomeState extends State<Home> {
               ),
             ), image: DecorationImage(
             fit: BoxFit.cover,
-            image: NetworkImage("https://image.tmdb.org/t/p/original${data.pic}")
+            image: data.pic != null ? NetworkImage("https://image.tmdb.org/t/p/original${data.pic}") : AssetImage('lib/assets/yellow.png') as ImageProvider,
         )),
         child: Column(
           children: [
@@ -504,7 +504,7 @@ class _HomeState extends State<Home> {
               ),
             ), image: DecorationImage(
             fit: BoxFit.cover,
-            image: NetworkImage("https://image.tmdb.org/t/p/original${data.poster}")
+            image: data.poster != null ? NetworkImage("https://image.tmdb.org/t/p/original${data.poster}") : AssetImage('lib/assets/red.png') as ImageProvider,
         )),
         child: Column(
           children: [
@@ -556,14 +556,6 @@ void _getGlobalResults(String value) {
   });
 }
 
-dynamic getMultiMovie(String value) {
-  Future response = Network().searchGlobal(value);
-
-  response.then((res) {
-    return res[2];
-  });
-}
-
 dynamic _getMovie(int mid) {
   Future response = Network().indexMovie(mid);
 
@@ -578,6 +570,12 @@ dynamic _getCast(int movieId) {
 
 dynamic _getNowPlaying() {
   Future response = Network().getNowPlaying();
+
+  return response;
+}
+
+dynamic _getActorDetails(int? id) {
+  Future response = Network().getActorDetails(id);
 
   return response;
 }
@@ -839,12 +837,6 @@ class _DetailsState extends State<Details> {
       ),
     );
   }
-}
-
-dynamic _getActorDetails(int? id) {
-  Future response = Network().getActorDetails(id);
-
-  return response;
 }
 
 class ActorsPage extends StatefulWidget {
