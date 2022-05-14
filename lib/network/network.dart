@@ -35,7 +35,7 @@ class Network {
         }
         else if (dataindex["media_type"] == "tv") {
           TVShow newShowX = TVShow(
-              title: dataindex["title"],
+              title: dataindex["name"],
               overview: dataindex["overview"],
               firstAir: dataindex["release_date"],
               poster: dataindex["poster_path"],

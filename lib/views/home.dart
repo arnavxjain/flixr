@@ -55,12 +55,13 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: bg,
       body: SingleChildScrollView(
-        child: Container(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Container(
           // height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.only(top: 55, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 55, left: 20, right: 20, bottom: 100),
           child: Column(
             children: contentOpacity == true ? [
-              _searchBar("Search for movies and actors", context),
+              _searchBar("Search for a movie, actor, or tv show", context),
               const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
@@ -85,10 +86,9 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
-              _futureActorBar(context),
               _futureMovieBar(context),
             ] : [
-              _searchBar("Search for movies and actors", context),
+              _searchBar("Search for a movie, actor or TV show", context),
               const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
@@ -112,7 +112,7 @@ class _HomeState extends State<Home> {
 
   Widget _searchBar(String placeholder, context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+      padding: const EdgeInsets.only(left: 14, right: 14),
       width: MediaQuery.of(context).size.width * 0.9,
       height: 47,
       decoration: ShapeDecoration(
@@ -149,7 +149,6 @@ class _HomeState extends State<Home> {
                 onSubmitted: (String value) {
                   if (value.isNotEmpty) {
                     _getGlobalResults(value);
-                    print(getMultiMovie(value));
                   }
                 },
                 style: const TextStyle(
@@ -180,21 +179,88 @@ class _HomeState extends State<Home> {
       child: MediaQuery.removePadding(
         removeTop: true,
         context: context,
-        child: ListView.builder(
-          // physics: const NeverScrollableScrollPhysics(),
-          itemCount: movieRes.length,
-          itemBuilder: (context, int index) {
-            return movieCard(movieRes[index]);
-          }
+        child: SizedBox(
+          height: double.infinity,
+          child: ListView(
+            physics: const ScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            children: [
+              _futureActorBar(context),
+              _futureShowBar(context),
+              const SizedBox(height: 20,),
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: movieRes.length,
+                itemBuilder: (context, int index) {
+                  return movieCard(movieRes[index]);
+                }
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // import 'dart:math';
+  Widget _futureActorBar(BuildContext context) => actorsRes.isNotEmpty ? Container(
+      height: 315,
+      margin: const EdgeInsets.only(top: 14),
+      decoration: ShapeDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 20.5,
+              cornerSmoothing: 1,
+            ),
+          )),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              SizedBox(width: 6,),
+              FaIcon(FontAwesomeIcons.solidCircleUser, size: 18,),
+              Text(" Actors", style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, fontSize: 20),),
+            ],
+          ),
+          const SizedBox(height: 6,),
+          _createCastList(actorsRes, context),
+        ],
+      )
+  ) : const SizedBox.shrink();
+
+  Widget _futureShowBar(BuildContext context) => showsRes.isNotEmpty ? Container(
+      height: 315,
+      margin: const EdgeInsets.only(top: 14),
+      decoration: ShapeDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 20.5,
+              cornerSmoothing: 1,
+            ),
+          )),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              SizedBox(width: 8,),
+              FaIcon(FontAwesomeIcons.tv, size: 16,),
+              Text(" TV Shows", style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, fontSize: 20),),
+              SizedBox(width: 2,),
+            ],
+          ),
+          const SizedBox(height: 6,),
+          _createShowList(showsRes, context),
+        ],
+      )
+  ) : const SizedBox.shrink();
 
   Random rnd = Random();
-// Define min and max value
   int min = 0, max = 3;
 
   Widget movieCard(Movie data) {
@@ -209,14 +275,6 @@ class _HomeState extends State<Home> {
           fit: BoxFit.cover,
           image: data.poster != null ? NetworkImage("https://image.tmdb.org/t/p/original${data.poster}") : AssetImage('lib/assets/${assetLoader[min + rnd.nextInt(max - min)]}.png') as ImageProvider,
         ),
-          shadows: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3), // changes position of shadow
-            ),
-          ],
           color: bgContrast,
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
@@ -340,30 +398,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _futureActorBar(BuildContext context) => actorsRes.length != 0 ? Container(
-      height: 315,
-      margin: const EdgeInsets.only(top: 14),
-      decoration: ShapeDecoration(
-          color: Colors.grey.withOpacity(0.2),
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 20.5,
-              cornerSmoothing: 1,
-            ),
-          )),
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(" Actors", style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, fontSize: 22),),
-          const SizedBox(height: 6,),
-          _createCastList(actorsRes, context),
-        ],
-      )
-    ) : const SizedBox.shrink();
-
   Widget _createCastList(List<Actor> data, context) {
-    return Container(
+    return SizedBox(
       height: 260,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -421,6 +457,76 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(width: 125, child: Text(data.name.toString(), style: const TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.7), overflow: TextOverflow.fade, maxLines: 1, softWrap: false)),
+                            Container(child: const FaIcon(FontAwesomeIcons.angleRight, color: Colors.blueAccent,), margin: const EdgeInsets.only(right: 6),)
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _createShowList(List<TVShow> actorsRes, BuildContext context) {
+    return SizedBox(
+      height: 260,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: actorsRes.length,
+        itemBuilder: (context, int index) {
+          return TVCard(actorsRes[index]);
+        }
+    ),
+    );
+  }
+
+  Widget TVCard(TVShow data) {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        // padding: EdgeInsets.all(10),
+        margin: const EdgeInsets.only(right: 15),
+        width: 200,
+        height: 280,
+        // alignment: Alignment.center,
+        decoration: ShapeDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 20.5,
+                cornerSmoothing: 1,
+              ),
+            ), image: DecorationImage(
+            fit: BoxFit.cover,
+            image: NetworkImage("https://image.tmdb.org/t/p/original${data.poster}")
+        )),
+        child: Column(
+          children: [
+            const SizedBox(height: 200),
+            SizedBox(
+              height: 60,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 200,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(width: 125, child: Text(data.title.toString(), style: const TextStyle(overflow: TextOverflow.ellipsis, color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.7), overflow: TextOverflow.fade, maxLines: 1, softWrap: false)),
                             Container(child: const FaIcon(FontAwesomeIcons.angleRight, color: Colors.blueAccent,), margin: const EdgeInsets.only(right: 6),)
                           ],
                         ),
@@ -540,7 +646,7 @@ class _DetailsState extends State<Details> {
                     children: [
                       _backButton(),
                       const SizedBox(width: 4),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: Text(
                           data!.title.toString(),
