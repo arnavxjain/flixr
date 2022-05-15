@@ -543,43 +543,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-void _getGlobalResults(String value) {
-  Future response = Network().searchGlobal(value);
-
-  // print(response);
-  response.then((res) {
-    movieRes = res[0];
-    showsRes = res[1];
-    actorsRes = res[2];
-
-    streamController.add(1);
-  });
-}
-
-dynamic _getMovie(int mid) {
-  Future response = Network().indexMovie(mid);
-
-  return response;
-}
-
-dynamic _getCast(int movieId) {
-  Future response = Network().getCast(movieId);
-
-  return response;
-}
-
-dynamic _getNowPlaying() {
-  Future response = Network().getNowPlaying();
-
-  return response;
-}
-
-dynamic _getActorDetails(int? id) {
-  Future response = Network().getActorDetails(id);
-
-  return response;
-}
-
 class Details extends StatefulWidget {
   final int mid;
   const Details({Key? key, required this.mid}) : super(key: key);
@@ -950,4 +913,41 @@ class _ActorsPageState extends State<ActorsPage> {
       ],
     );
   }
+}
+
+void _getGlobalResults(String value) {
+  Future response = Network().searchGlobal(value);
+
+  // print(response);
+  response.then((res) {
+    movieRes = res[0];
+    showsRes = res[1];
+    actorsRes = res[2];
+
+    streamController.add(1);
+  });
+}
+
+dynamic _getMovie(int mid) {
+  Future response = Network().indexMovie(mid);
+
+  return response;
+}
+
+dynamic _getCast(int movieId) {
+  Future response = Network().getCast(movieId);
+
+  return response;
+}
+
+dynamic _getNowPlaying() {
+  Future response = Network().getNowPlaying();
+
+  return response;
+}
+
+dynamic _getActorDetails(int? id) {
+  Future response = Network().getActorDetails(id);
+
+  return response;
 }
