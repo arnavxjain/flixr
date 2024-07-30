@@ -1,4 +1,4 @@
-# Flixr
+# 🎬 Flixr
 - Access every movie database in the world in seconds
 - Made entirely using Flutter
 - Simple & Clean Design/UI
